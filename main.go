@@ -1,16 +1,26 @@
 package main
 
 import (
-	"net/http"
+	"example/auth/middlewares"
+	"example/auth/controllers"
+	"example/auth/initializers"
 
 	"github.com/gin-gonic/gin"
 )
 
-func main() {
-	r := gin.Default()
 
-	r.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"data": "heeeeyyy"})
-	})
-	r.Run()
+func init() {
+	initializers.LoadEnvs()
+	initializers.ConnectDB()
+
+}
+
+
+func main() {
+	router := gin.Default()
+
+	router.POST("/auth/signup", controllers.CreateUser)
+	router.POST("/auth/login", controllers.Login)
+	router.GET("/user/profile", middlewares.CheckAuth, controllers.GetUserProfile)
+	router.Run()
 }
